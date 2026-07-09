@@ -8,10 +8,11 @@ module.exports = {
  category: "NSFW",
  usage: "ass",
  run: async (client, message, args) => {
-  if (!message.channel.nsfw) {
+  const NSFW_CHANNEL_ID = "1524868049675485244";
+  if (message.channel.id !== NSFW_CHANNEL_ID || !message.channel.nsfw) {
    const nsfwembed = new MessageEmbed()
     .setColor("RED")
-    .setDescription(`${client.bot_emojis.anger} | You can use this command only in an NSFW Channel!`)
+    .setDescription(`${client.bot_emojis.anger} | Este comando solo se puede usar en el canal NSFW autorizado (marcado como +18 en Discord).`)
     .setFooter(
      `Requested by ${message.author.username}`,
      message.author.displayAvatarURL({
