@@ -5,6 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "@discordjs/builders": "^1.3.0",
+    "@discordjs/voice": "^0.18.0",
     "@iamtraction/google-translate": "^1.1.2",
     "akaneko": "^5.2.3",
     "axios": "^0.27.2",
@@ -15,17 +16,20 @@
     "enmap": "^5.9.0",
     "express": "^4.18.1",
     "images-scraper": "^6.4.0",
+    "libsodium-wrappers": "^0.8.4",
     "megadb": "^3.4.0",
     "moment": "^2.29.3",
     "ms": "^2.1.3",
     "nekos.life": "^2.0.7",
     "node-fetch": "^2.6.1",
+    "opusscript": "^0.0.8",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.9",
     "superagent": "^8.0.3",
-    "translate-google": "^1.5.0"
+    "translate-google": "^1.5.0",
+    "ytdl-core": "^4.11.5",
+    "ytsr": "^3.8.4"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"

@@ -4,11 +4,11 @@ const superagent = require("superagent");
 const NSFW_CHANNEL_ID = "1524868049675485244";
 
 module.exports = {
-  name: "hentai",
-  aliases: [],
-  description: "Muestra una imagen hentai aleatoria +18",
+  name: "yaoi",
+  aliases: ["gay"],
+  description: "Muestra un gif aleatorio +18 de hombres",
   category: "NSFW",
-  usage: "hentai",
+  usage: "yaoi",
   run: async (client, message, args) => {
     if (message.channel.id !== NSFW_CHANNEL_ID || !message.channel.nsfw) {
       const nsfwembed = new MessageEmbed()
@@ -23,10 +23,10 @@ module.exports = {
     const sent = await message.channel.send(loading);
 
     try {
-      const response = await superagent.get("https://api.n-sfw.com/nsfw/hentai");
+      const response = await superagent.get("https://purrbot.site/api/img/nsfw/yaoi/gif");
       const embed = new MessageEmbed()
         .setColor("RANDOM")
-        .setImage(response.body.url)
+        .setImage(response.body.link)
         .setFooter(`Solicitado por ${message.author.username}`, message.author.displayAvatarURL({ dynamic: true }))
         .setTimestamp();
       await sent.edit(embed);

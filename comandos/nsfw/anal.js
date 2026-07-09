@@ -25,7 +25,6 @@ module.exports = {
     try {
       const response = await superagent.get("https://api.n-sfw.com/nsfw/anal");
       const embed = new MessageEmbed()
-        .setDescription(`:underage:\n**[¿No carga la imagen? haz clic aquí](${response.body.url})**`)
         .setColor("RANDOM")
         .setImage(response.body.url)
         .setFooter(`Solicitado por ${message.author.username}`, message.author.displayAvatarURL({ dynamic: true }))
