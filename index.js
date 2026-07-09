@@ -1,7 +1,7 @@
 const Discord = require('discord.js')
 const db = require('megadb')
 let nivel = new db.crearDB('niveles');
-const client = new Discord.Client()
+const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] })
 const { vivo } = require("./server.js")
 const { badwords } = require("./data.json")
 require('dotenv').config();
