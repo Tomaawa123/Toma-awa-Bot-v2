@@ -84,14 +84,23 @@ let prefix = "t!"
 ///////////////////HANDLER////////////////
 
 client.commands = new Discord.Collection();
-const commandfiles = fs.readdirSync('./comandos').filter(file => file.endsWith('.js'));
 
-for (const file of commandfiles) {
-  const command = require(`./comandos/${file}`);
-  client.commands.set(command.name, command);
-
-
+function cargarComandos(dir) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  for (const entry of entries) {
+    const fullPath = `${dir}/${entry.name}`;
+    if (entry.isDirectory()) {
+      cargarComandos(fullPath);
+    } else if (entry.name.endsWith('.js')) {
+      const command = require(`./${fullPath}`);
+      if (command && command.name) {
+        client.commands.set(command.name, command);
+      }
+    }
+  }
 }
+
+cargarComandos('comandos');
 
 client.on("message", (message) => {
 
