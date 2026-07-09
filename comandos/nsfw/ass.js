@@ -22,7 +22,7 @@ module.exports = {
      })
     )
     .setImage("https://media.discordapp.net/attachments/721019707607482409/855827123616481300/nsfw.gif");
-   return message.reply({ embeds: [nsfwembed] });
+   return message.reply(nsfwembed);
   }
   return rp
    .get("http://api.obutts.ru/butts/0/1/random")
@@ -54,7 +54,7 @@ module.exports = {
       })
      )
      .setTimestamp();
-    message.reply({ embeds: [embed], files: [file] });
+    message.reply(embed, { files: [file] });
    })
    .catch((err) => {
     return client.createCommandError(message, err);

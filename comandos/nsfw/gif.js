@@ -16,11 +16,11 @@ module.exports = {
         .setDescription("⚠️ | Este comando solo se puede usar en el canal NSFW autorizado (marcado como +18 en Discord).")
         .setFooter(`Solicitado por ${message.author.username}`, message.author.displayAvatarURL({ dynamic: true }))
         .setImage("https://media.discordapp.net/attachments/721019707607482409/855827123616481300/nsfw.gif");
-      return message.reply({ embeds: [nsfwembed] });
+      return message.reply(nsfwembed);
     }
 
     const loading = new MessageEmbed().setDescription("Por favor espera...").setTimestamp();
-    const sent = await message.channel.send({ embeds: [loading] });
+    const sent = await message.channel.send(loading);
 
     try {
       const response = await superagent.get("https://nekobot.xyz/api/image").query({ type: "pgif" });
@@ -30,9 +30,9 @@ module.exports = {
         .setImage(response.body.message)
         .setFooter(`Solicitado por ${message.author.username}`, message.author.displayAvatarURL({ dynamic: true }))
         .setTimestamp();
-      await sent.edit({ embeds: [embed] });
+      await sent.edit(embed);
     } catch (err) {
-      await sent.edit({ content: "Ocurrió un error al obtener la imagen, intenta de nuevo." });
+      await sent.edit("Ocurrió un error al obtener la imagen, intenta de nuevo.");
     }
   },
 };

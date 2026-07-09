@@ -1,0 +1,1 @@
+- [Discord bot version quirks](discord-v12-bot.md) — this project's bot runs discord.js v12, not v13+; embed/send syntax differs.
