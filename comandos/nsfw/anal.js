@@ -23,11 +23,11 @@ module.exports = {
     const sent = await message.channel.send(loading);
 
     try {
-      const response = await superagent.get("https://nekobot.xyz/api/image").query({ type: "anal" });
+      const response = await superagent.get("https://api.n-sfw.com/nsfw/anal");
       const embed = new MessageEmbed()
-        .setDescription(`:underage:\n**[¿No carga la imagen? haz clic aquí](${response.body.message})**`)
+        .setDescription(`:underage:\n**[¿No carga la imagen? haz clic aquí](${response.body.url})**`)
         .setColor("RANDOM")
-        .setImage(response.body.message)
+        .setImage(response.body.url)
         .setFooter(`Solicitado por ${message.author.username}`, message.author.displayAvatarURL({ dynamic: true }))
         .setTimestamp();
       await sent.edit(embed);
