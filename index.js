@@ -2,7 +2,6 @@ const Discord = require('discord.js')
 const db = require('megadb')
 let nivel = new db.crearDB('niveles');
 const client = new Discord.Client()
-const dba = require("quick.db");
 const { vivo } = require("./server.js")
 const { badwords } = require("./data.json")
 require('dotenv').config();
@@ -306,5 +305,5 @@ client.on("message", async (message) => {
 
 client.login(process.env.TOKEN);
 
-console.log("[ Bot ] Toma awa#5103 Esta conectado!")
+console.log("[ Bot ] Toma awa#6300 Esta conectado!")
 console.log("Estoy Listo!")

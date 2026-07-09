@@ -1,5 +1,6 @@
 { pkgs }: {
 	deps = [
+   pkgs.python3
 		pkgs.nodejs-12_x
 		pkgs.nodePackages.typescript-language-server
 		pkgs.yarn
