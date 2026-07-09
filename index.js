@@ -16,8 +16,6 @@ client.on('message', async message => {
     return;
   }
 
-  console.log(`[DEBUG] Mensaje recibido de ${message.author.tag}: "${message.content}"`);
-
   let user = message.author.tag
 
   var idid = message.guild.id + message.author.id
