@@ -259,8 +259,21 @@ client.on('guildMemberRemove', async (member) => {
 
 /////////////////////////////////////
 
+function get_substrings_between(text, start, end) {
+  const results = [];
+  const parts = text.split(start);
+  for (let i = 1; i < parts.length; i++) {
+    const endIndex = parts[i].indexOf(end);
+    if (endIndex !== -1) {
+      results.push(parts[i].slice(0, endIndex));
+    }
+  }
+  return results;
+}
+
 client.on("message", async (message) => {
   if (message.author.bot) return;
+  if (!message.guild) return;
   let substringArray = get_substrings_between(message.content, ":", ":");
   let msg = message.content;
   if (!substringArray.length) return;
