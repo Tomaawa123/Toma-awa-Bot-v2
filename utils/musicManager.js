@@ -11,6 +11,41 @@ const ytdl = require("ytdl-core");
 const ytsr = require("ytsr");
 
 const guildQueues = new Map();
+const adapters = new Map();
+let voiceEventsRegistered = false;
+
+function registerVoiceEvents(client) {
+  if (voiceEventsRegistered) return;
+  voiceEventsRegistered = true;
+  client.ws.on("VOICE_SERVER_UPDATE", (payload) => {
+    const adapter = adapters.get(payload.guild_id);
+    if (adapter) adapter.onVoiceServerUpdate(payload);
+  });
+  client.ws.on("VOICE_STATE_UPDATE", (payload) => {
+    if (payload.user_id !== client.user.id) return;
+    const adapter = adapters.get(payload.guild_id);
+    if (adapter) adapter.onVoiceStateUpdate(payload);
+  });
+}
+
+function createDiscordJsV12Adapter(guild) {
+  return (methods) => {
+    adapters.set(guild.id, methods);
+    return {
+      sendPayload: (data) => {
+        try {
+          guild.shard.send(data);
+          return true;
+        } catch (e) {
+          return false;
+        }
+      },
+      destroy: () => {
+        adapters.delete(guild.id);
+      },
+    };
+  };
+}
 
 function getQueue(guildId) {
   return guildQueues.get(guildId);
@@ -20,10 +55,12 @@ function ensureQueue(guild, voiceChannel, textChannel) {
   let queue = guildQueues.get(guild.id);
   if (queue) return queue;
 
+  registerVoiceEvents(guild.client);
+
   const connection = joinVoiceChannel({
     channelId: voiceChannel.id,
     guildId: guild.id,
-    adapterCreator: guild.voiceAdapterCreator,
+    adapterCreator: createDiscordJsV12Adapter(guild),
   });
 
   const player = createAudioPlayer();
@@ -101,7 +138,7 @@ async function searchSong(query) {
     return { title: info.videoDetails.title, url: info.videoDetails.video_url };
   }
   const filters = await ytsr.getFilters(query);
-  const filter = filters.get("Type").get("Video");
+  const filter = filters.get("Type").get("Videos");
   const search = await ytsr(filter.url, { limit: 5 });
   const video = search.items.find((item) => item.type === "video");
   if (!video) return null;
