@@ -8,13 +8,13 @@ const {
   StreamType,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
-const ytSearch = require("yt-search"); // Librería estable para búsquedas
+const ytSearch = require("yt-search");
 
 const guildQueues = new Map();
 const adapters = new Map();
 let voiceEventsRegistered = false;
 
-// --- MANTENEMOS TUS ADAPTADORES V12 ---
+// --- ADAPTADORES V12 ---
 function registerVoiceEvents(client) {
   if (voiceEventsRegistered) return;
   voiceEventsRegistered = true;
@@ -41,7 +41,7 @@ function createDiscordJsV12Adapter(guild) {
   };
 }
 
-// --- LOGICA DE COLA ---
+// --- FUNCIONES DE GESTIÓN DE COLA ---
 function getQueue(guildId) {
   return guildQueues.get(guildId);
 }
@@ -66,19 +66,26 @@ function ensureQueue(guild, voiceChannel, textChannel) {
   return queue;
 }
 
-// --- BUSQUEDA ESTABLE ---
+function destroyQueue(guildId) {
+  const queue = guildQueues.get(guildId);
+  if (!queue) return;
+  try {
+    queue.player.stop();
+    queue.connection.destroy();
+  } catch (e) { console.error("Error destruyendo cola:", e); }
+  guildQueues.delete(guildId);
+}
+
+// --- BUSQUEDA Y REPRODUCCIÓN ---
 async function searchSong(query) {
   try {
     if (ytdl.validateURL(query)) {
       const info = await ytdl.getBasicInfo(query);
       return { title: info.videoDetails.title, url: info.videoDetails.video_url };
     }
-    
     const result = await ytSearch(query);
     const video = result.videos[0];
-    
-    if (!video) return null;
-    return { title: video.title, url: video.url };
+    return video ? { title: video.title, url: video.url } : null;
   } catch (err) {
     console.error("Error en búsqueda:", err);
     return null;
@@ -100,4 +107,13 @@ async function playSong(guildId, song) {
   queue.playing = true;
 }
 
-module.exports = { guildQueues, ensureQueue, playSong, searchSong, getQueue, registerVoiceEvents };
+// --- EXPORTACIÓN CORRECTA ---
+module.exports = { 
+  guildQueues, 
+  ensureQueue, 
+  playSong, 
+  searchSong, 
+  getQueue, 
+  destroyQueue, 
+  registerVoiceEvents 
+};
