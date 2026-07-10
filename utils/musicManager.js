@@ -122,11 +122,18 @@ function ensureQueue(guild, voiceChannel, textChannel) {
 async function playSong(guildId, song) {
   const queue = guildQueues.get(guildId);
   if (!queue) return;
-  const stream = ytdl(song.url, {
+  
+  const stream = await ytdl(song.url, {
     filter: "audioonly",
     quality: "highestaudio",
     highWaterMark: 1 << 25,
   });
+
+  if (!stream) {
+    queue.textChannel.send('❌ No se pudo obtener la canción. Intenta con otro enlace o título.');
+    return;
+  }
+
   const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
   queue.player.play(resource);
   queue.playing = true;
@@ -136,11 +143,10 @@ async function searchSong(query) {
   try {
     // Si el usuario ingresó un enlace de YouTube
     if (ytdl.validateURL(query)) {
-      const info = await ytdl.getBasicInfo(query);
-
+      const info = await ytdl.video_info(query);
       return {
-        title: info.videoDetails.title,
-        url: info.videoDetails.video_url,
+        title: info.video_details.title,
+        url: info.video_details.url,
       };
     }
 
@@ -162,6 +168,7 @@ async function searchSong(query) {
     return null;
   }
 }
+
 function destroyQueue(guildId) {
   const queue = guildQueues.get(guildId);
   if (!queue) return;
