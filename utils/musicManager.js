@@ -8,13 +8,13 @@ const {
   StreamType,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
-const ytSearch = require("yt-search"); // CAMBIO: Usamos yt-search
+const ytSearch = require("yt-search"); // Librería estable para búsquedas
 
 const guildQueues = new Map();
 const adapters = new Map();
 let voiceEventsRegistered = false;
 
-// --- MANTENEMOS TUS ADAPTADORES (NO TOCAR PARA QUE T!J FUNCIONE) ---
+// --- MANTENEMOS TUS ADAPTADORES V12 ---
 function registerVoiceEvents(client) {
   if (voiceEventsRegistered) return;
   voiceEventsRegistered = true;
@@ -42,6 +42,10 @@ function createDiscordJsV12Adapter(guild) {
 }
 
 // --- LOGICA DE COLA ---
+function getQueue(guildId) {
+  return guildQueues.get(guildId);
+}
+
 function ensureQueue(guild, voiceChannel, textChannel) {
   let queue = guildQueues.get(guild.id);
   if (queue) return queue;
@@ -62,7 +66,7 @@ function ensureQueue(guild, voiceChannel, textChannel) {
   return queue;
 }
 
-// --- BUSQUEDA ESTABLE (SOLUCIONA EL FALLO) ---
+// --- BUSQUEDA ESTABLE ---
 async function searchSong(query) {
   try {
     if (ytdl.validateURL(query)) {
@@ -96,4 +100,4 @@ async function playSong(guildId, song) {
   queue.playing = true;
 }
 
-module.exports = { guildQueues, ensureQueue, playSong, searchSong, registerVoiceEvents };
+module.exports = { guildQueues, ensureQueue, playSong, searchSong, getQueue, registerVoiceEvents };
