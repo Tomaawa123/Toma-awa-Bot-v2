@@ -1,188 +1,66 @@
-const {
-  joinVoiceChannel,
-  createAudioPlayer,
-  createAudioResource,
-  AudioPlayerStatus,
-  VoiceConnectionStatus,
-  entersState,
-  StreamType,
-} = require("@discordjs/voice");
-const ytdl = require("play-dl");
-const ytSearch = require("yt-search");
+const { createAudioResource, StreamType } = require("@discordjs/voice");
+const play = require("play-dl");
 
 const guildQueues = new Map();
-const adapters = new Map();
-let voiceEventsRegistered = false;
 
-function registerVoiceEvents(client) {
-  if (voiceEventsRegistered) return;
-  voiceEventsRegistered = true;
-  client.ws.on("VOICE_SERVER_UPDATE", (payload) => {
-    const adapter = adapters.get(payload.guild_id);
-    if (adapter) adapter.onVoiceServerUpdate(payload);
-  });
-  client.ws.on("VOICE_STATE_UPDATE", (payload) => {
-    if (payload.user_id !== client.user.id) return;
-    const adapter = adapters.get(payload.guild_id);
-    if (adapter) adapter.onVoiceStateUpdate(payload);
-  });
-}
-
-function createDiscordJsV12Adapter(guild) {
-  return (methods) => {
-    adapters.set(guild.id, methods);
-    return {
-      sendPayload: (data) => {
-        try {
-          guild.shard.send(data);
-          return true;
-        } catch (e) {
-          return false;
-        }
-      },
-      destroy: () => {
-        adapters.delete(guild.id);
-      },
-    };
-  };
-}
-
-function getQueue(guildId) {
-  return guildQueues.get(guildId);
-}
-
+// Función auxiliar para obtener o crear la cola
 function ensureQueue(guild, voiceChannel, textChannel) {
   let queue = guildQueues.get(guild.id);
-  if (queue) return queue;
-
-  registerVoiceEvents(guild.client);
-
-  const connection = joinVoiceChannel({
-    channelId: voiceChannel.id,
-    guildId: guild.id,
-    adapterCreator: createDiscordJsV12Adapter(guild),
-  });
-
-  const player = createAudioPlayer();
-  connection.subscribe(player);
-
-  queue = {
-    connection,
-    player,
-    voiceChannel,
-    textChannel,
-    songs: [],
-    loop: false,
-    loopQueue: false,
-    playing: false,
-  };
-
-  player.on(AudioPlayerStatus.Idle, () => {
-    if (!queue.songs.length) return;
-    if (queue.loop) {
-      playSong(guild.id, queue.songs[0]);
-      return;
-    }
-    const finished = queue.songs.shift();
-    if (queue.loopQueue && finished) {
-      queue.songs.push(finished);
-    }
-    if (queue.songs.length) {
-      playSong(guild.id, queue.songs[0]);
-    } else {
-      queue.playing = false;
-    }
-  });
-
-  player.on("error", (err) => {
-    console.error("Error de reproducción:", err.message);
-    queue.textChannel.send("⚠️ Ocurrió un error reproduciendo la canción, saltando a la siguiente...");
-    const finished = queue.songs.shift();
-    if (queue.loopQueue && finished) queue.songs.push(finished);
-    if (queue.songs.length) playSong(guild.id, queue.songs[0]);
-    else queue.playing = false;
-  });
-
-  connection.on(VoiceConnectionStatus.Disconnected, async () => {
-    try {
-      await Promise.race([
-        entersState(connection, VoiceConnectionStatus.Signalling, 5000),
-        entersState(connection, VoiceConnectionStatus.Connecting, 5000),
-      ]);
-    } catch (err) {
-      guildQueues.delete(guild.id);
-      try { connection.destroy(); } catch (e) {}
-    }
-  });
-
-  guildQueues.set(guild.id, queue);
-  return queue;
-}
-
-async function playSong(guildId, song) {
-  const queue = guildQueues.get(guildId);
-  if (!queue) return;
-  
-  const stream = await ytdl(song.url, {
-    filter: "audioonly",
-    quality: "highestaudio",
-    highWaterMark: 1 << 25,
-  });
-
-  if (!stream) {
-    queue.textChannel.send('❌ No se pudo obtener la canción. Intenta con otro enlace o título.');
-    return;
+  if (!queue) {
+    queue = {
+      voiceChannel,
+      textChannel,
+      player: null, // Deberás inicializarlo en tu lógica principal
+      songs: [],
+      playing: false,
+    };
+    guildQueues.set(guild.id, queue);
   }
-
-  const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
-  queue.player.play(resource);
-  queue.playing = true;
+  return queue;
 }
 
 async function searchSong(query) {
   try {
-    // Si el usuario ingresó un enlace de YouTube
-    if (ytdl.validateURL(query)) {
-      const info = await ytdl.video_info(query);
+    // 1. Validar si es enlace directo
+    if (play.yt_validate(query) === 'video') {
+      const info = await play.video_info(query);
       return {
         title: info.video_details.title,
         url: info.video_details.url,
       };
     }
 
-    // Buscar por nombre
-    const result = await ytSearch(query);
-
-    if (!result || !result.videos || result.videos.length === 0) {
-      return null;
-    }
-
-    const video = result.videos[0];
+    // 2. Buscar por nombre si no es un link
+    const searchResults = await play.search(query, { source: { youtube: "video" }, limit: 1 });
+    if (!searchResults || searchResults.length === 0) return null;
 
     return {
-      title: video.title,
-      url: video.url,
+      title: searchResults[0].title,
+      url: searchResults[0].url,
     };
   } catch (err) {
-    console.error("Error buscando canción:", err);
+    console.error("Error en searchSong:", err);
     return null;
   }
 }
 
-function destroyQueue(guildId) {
+async function playSong(guildId, song) {
   const queue = guildQueues.get(guildId);
   if (!queue) return;
+
   try {
-    queue.player.stop();
-    queue.connection.destroy();
-  } catch (e) {}
-  guildQueues.delete(guildId);
+    // Obtenemos el stream directamente con play-dl
+    const streamData = await play.stream(song.url);
+    const resource = createAudioResource(streamData.stream, {
+      inputType: streamData.type,
+    });
+
+    queue.player.play(resource);
+    queue.playing = true;
+  } catch (err) {
+    console.error("Error al reproducir:", err);
+    queue.textChannel.send("❌ Error al intentar reproducir el audio.");
+  }
 }
 
-module.exports = {
-  getQueue,
-  ensureQueue,
-  playSong,
-  searchSong,
-  destroyQueue,
-};
+module.exports = { guildQueues, ensureQueue, searchSong, playSong };
