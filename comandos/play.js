@@ -1,5 +1,4 @@
-const { MessageEmbed } = require("discord.js");
-const { ensureQueue, playSong, searchSong } = require("../utils/musicManager"); // Asegura que la ruta sea correcta
+const { searchSong, guildQueues, playSong } = require("../utils/musicManager");
 
 module.exports = {
   name: "play",
@@ -7,26 +6,26 @@ module.exports = {
   run: async (client, message, args) => {
     const voiceChannel = message.member.voice.channel;
     if (!voiceChannel) return message.channel.send("⚠️ Debes estar en un canal de voz.");
-    
-    if (!args.length) return message.channel.send("⚠️ Escribe el nombre o link de la canción.");
 
     const query = args.join(" ");
-    const searching = await message.channel.send(`🔎 Buscando: **${query}**...`);
+    if (!query) return message.channel.send("⚠️ Escribe el nombre o link.");
 
-    let song = await searchSong(query);
+    const song = await searchSong(query);
+    if (!song) return message.channel.send("❌ No encontré resultados.");
 
-    if (!song) {
-      return searching.edit("❌ No encontré resultados para esa búsqueda.");
+    let queue = guildQueues.get(message.guild.id);
+
+    if (!queue) {
+      const connection = await voiceChannel.join();
+      queue = { connection, songs: [], playing: false };
+      guildQueues.set(message.guild.id, queue);
     }
 
-    const queue = ensureQueue(message.guild, voiceChannel, message.channel);
     queue.songs.push(song);
+    message.channel.send(`✅ Agregado: **${song.title}**`);
 
     if (!queue.playing) {
-      await playSong(message.guild.id, queue.songs[0]);
-      searching.edit(`▶️ Reproduciendo ahora: **${song.title}**`);
-    } else {
-      searching.edit(`✅ Agregado a la cola: **${song.title}**`);
+      playSong(message.guild, queue.songs[0], message.channel);
     }
   },
 };
