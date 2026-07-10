@@ -1,6 +1,5 @@
 const ytdl = require('ytdl-core');
 const ytSearch = require('yt-search');
-
 const guildQueues = new Map();
 
 async function searchSong(query) {
@@ -9,8 +8,7 @@ async function searchSong(query) {
         return { title: info.videoDetails.title, url: info.videoDetails.video_url };
     }
     const r = await ytSearch(query);
-    const video = r.videos[0];
-    return video ? { title: video.title, url: video.url } : null;
+    return r.videos[0] ? { title: r.videos[0].title, url: r.videos[0].url } : null;
 }
 
 function playSong(guild, song, channel) {
@@ -20,13 +18,15 @@ function playSong(guild, song, channel) {
 
     dispatcher.on('finish', () => {
         queue.songs.shift();
-        if (queue.songs.length > 0) {
-            playSong(guild, queue.songs[0], channel);
-        } else {
+        if (queue.songs.length > 0) playSong(guild, queue.songs[0], channel);
+        else {
             queue.playing = false;
+            // Opcional: desconectar si quieres
+            // queue.connection.disconnect();
         }
     });
-
+    
+    dispatcher.on('error', console.error);
     queue.playing = true;
 }
 
