@@ -8,7 +8,7 @@ const {
   StreamType,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
-const ytsr = require("ytsr");
+const ytSearch = require("yt-search");
 
 const guildQueues = new Map();
 const adapters = new Map();
@@ -133,18 +133,35 @@ async function playSong(guildId, song) {
 }
 
 async function searchSong(query) {
-  if (ytdl.validateURL(query)) {
-    const info = await ytdl.getBasicInfo(query);
-    return { title: info.videoDetails.title, url: info.videoDetails.video_url };
-  }
-  const filters = await ytsr.getFilters(query);
-  const filter = filters.get("Type").get("Videos");
-  const search = await ytsr(filter.url, { limit: 5 });
-  const video = search.items.find((item) => item.type === "video");
-  if (!video) return null;
-  return { title: video.title, url: video.url };
-}
+  try {
+    // Si el usuario ingresó un enlace de YouTube
+    if (ytdl.validateURL(query)) {
+      const info = await ytdl.getBasicInfo(query);
 
+      return {
+        title: info.videoDetails.title,
+        url: info.videoDetails.video_url,
+      };
+    }
+
+    // Buscar por nombre
+    const result = await ytSearch(query);
+
+    if (!result || !result.videos || result.videos.length === 0) {
+      return null;
+    }
+
+    const video = result.videos[0];
+
+    return {
+      title: video.title,
+      url: video.url,
+    };
+  } catch (err) {
+    console.error("Error buscando canción:", err);
+    return null;
+  }
+}
 function destroyQueue(guildId) {
   const queue = guildQueues.get(guildId);
   if (!queue) return;
