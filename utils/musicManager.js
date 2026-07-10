@@ -8,13 +8,13 @@ const {
   StreamType,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
-const ytSearch = require("yt-search");
+const ytSearch = require("yt-search"); // Librería estable
 
 const guildQueues = new Map();
 const adapters = new Map();
 let voiceEventsRegistered = false;
 
-// --- ADAPTADORES V12 ---
+// --- ADAPTADORES V12 (NO TOCAR) ---
 function registerVoiceEvents(client) {
   if (voiceEventsRegistered) return;
   voiceEventsRegistered = true;
@@ -41,9 +41,17 @@ function createDiscordJsV12Adapter(guild) {
   };
 }
 
-// --- FUNCIONES DE GESTIÓN DE COLA ---
+// --- GESTIÓN DE COLAS ---
 function getQueue(guildId) {
   return guildQueues.get(guildId);
+}
+
+function destroyQueue(guildId) {
+  const queue = guildQueues.get(guildId);
+  if (queue) {
+    try { queue.player.stop(); queue.connection.destroy(); } catch (e) {}
+    guildQueues.delete(guildId);
+  }
 }
 
 function ensureQueue(guild, voiceChannel, textChannel) {
@@ -66,17 +74,7 @@ function ensureQueue(guild, voiceChannel, textChannel) {
   return queue;
 }
 
-function destroyQueue(guildId) {
-  const queue = guildQueues.get(guildId);
-  if (!queue) return;
-  try {
-    queue.player.stop();
-    queue.connection.destroy();
-  } catch (e) { console.error("Error destruyendo cola:", e); }
-  guildQueues.delete(guildId);
-}
-
-// --- BUSQUEDA Y REPRODUCCIÓN ---
+// --- BUSQUEDA ESTABLE ---
 async function searchSong(query) {
   try {
     if (ytdl.validateURL(query)) {
@@ -107,7 +105,6 @@ async function playSong(guildId, song) {
   queue.playing = true;
 }
 
-// --- EXPORTACIÓN CORRECTA ---
 module.exports = { 
   guildQueues, 
   ensureQueue, 
