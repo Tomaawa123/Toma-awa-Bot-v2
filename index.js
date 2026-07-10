@@ -37,6 +37,9 @@ client.on('message', async message => {
 })
 
 client.on("message", (message) => {
+  client.on("hasPermission", (hasPermission) => {
+
+    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
 
   let confirm = false;
 
