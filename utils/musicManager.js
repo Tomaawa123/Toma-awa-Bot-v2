@@ -8,12 +8,13 @@ const {
   StreamType,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
-const ytSearch = require("yt-search"); // CAMBIO AQUÍ
+const ytSearch = require("yt-search"); // CAMBIO: Usamos yt-search
 
 const guildQueues = new Map();
 const adapters = new Map();
 let voiceEventsRegistered = false;
 
+// --- MANTENEMOS TUS ADAPTADORES (NO TOCAR PARA QUE T!J FUNCIONE) ---
 function registerVoiceEvents(client) {
   if (voiceEventsRegistered) return;
   voiceEventsRegistered = true;
@@ -33,64 +34,66 @@ function createDiscordJsV12Adapter(guild) {
     adapters.set(guild.id, methods);
     return {
       sendPayload: (data) => {
-        try {
-          guild.shard.send(data);
-          return true;
-        } catch (e) {
-          return false;
-        }
+        try { guild.shard.send(data); return true; } catch (e) { return false; }
       },
       destroy: () => { adapters.delete(guild.id); },
     };
   };
 }
 
+// --- LOGICA DE COLA ---
 function ensureQueue(guild, voiceChannel, textChannel) {
   let queue = guildQueues.get(guild.id);
   if (queue) return queue;
+  
   registerVoiceEvents(guild.client);
+  
   const connection = joinVoiceChannel({
     channelId: voiceChannel.id,
     guildId: guild.id,
     adapterCreator: createDiscordJsV12Adapter(guild),
   });
+
   const player = createAudioPlayer();
   connection.subscribe(player);
-  queue = { connection, player, voiceChannel, textChannel, songs: [], playing: false };
   
-  player.on(AudioPlayerStatus.Idle, () => {
-    queue.songs.shift();
-    if (queue.songs.length) playSong(guild.id, queue.songs[0]);
-    else queue.playing = false;
-  });
-
+  queue = { connection, player, textChannel, songs: [], playing: false };
   guildQueues.set(guild.id, queue);
   return queue;
 }
 
-async function playSong(guildId, song) {
-  const queue = guildQueues.get(guildId);
-  if (!queue) return;
-  const stream = ytdl(song.url, { filter: "audioonly", highWaterMark: 1 << 25 });
-  const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
-  queue.player.play(resource);
-  queue.playing = true;
-}
-
-// BUSQUEDA ESTABLE
+// --- BUSQUEDA ESTABLE (SOLUCIONA EL FALLO) ---
 async function searchSong(query) {
   try {
     if (ytdl.validateURL(query)) {
       const info = await ytdl.getBasicInfo(query);
       return { title: info.videoDetails.title, url: info.videoDetails.video_url };
     }
-    const r = await ytSearch(query);
-    const video = r.videos[0];
-    return video ? { title: video.title, url: video.url } : null;
-  } catch (e) {
-    console.error("Error en búsqueda:", e);
+    
+    const result = await ytSearch(query);
+    const video = result.videos[0];
+    
+    if (!video) return null;
+    return { title: video.title, url: video.url };
+  } catch (err) {
+    console.error("Error en búsqueda:", err);
     return null;
   }
 }
 
-module.exports = { ensureQueue, playSong, searchSong, guildQueues };
+async function playSong(guildId, song) {
+  const queue = guildQueues.get(guildId);
+  if (!queue) return;
+  
+  const stream = ytdl(song.url, {
+    filter: "audioonly",
+    quality: "highestaudio",
+    highWaterMark: 1 << 25,
+  });
+  
+  const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
+  queue.player.play(resource);
+  queue.playing = true;
+}
+
+module.exports = { guildQueues, ensureQueue, playSong, searchSong, registerVoiceEvents };
