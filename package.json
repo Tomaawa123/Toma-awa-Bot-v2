@@ -7,6 +7,7 @@
   "node": "20.x"
 },
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
     "@iamtraction/google-translate": "^1.1.2",
     "akaneko": "^5.2.3",
     "axios": "^0.27.2",

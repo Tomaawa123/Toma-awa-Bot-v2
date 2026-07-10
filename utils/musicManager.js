@@ -8,14 +8,11 @@ const {
   StreamType,
 } = require("@discordjs/voice");
 const ytdl = require("ytdl-core");
-const ytSearch = require("yt-search"); // CAMBIO: Usamos yt-search
+const ytSearch = require("yt-search"); // CAMBIO AQUÍ
 
 const guildQueues = new Map();
 const adapters = new Map();
 let voiceEventsRegistered = false;
-
-// ... [MANTÉN TUS FUNCIONES registerVoiceEvents Y createDiscordJsV12Adapter IGUALES] ...
-// (No he modificado estas funciones para que tus otros comandos no fallen)
 
 function registerVoiceEvents(client) {
   if (voiceEventsRegistered) return;
@@ -48,27 +45,25 @@ function createDiscordJsV12Adapter(guild) {
   };
 }
 
-// ensureQueue, playSong y searchSong modificadas:
-
 function ensureQueue(guild, voiceChannel, textChannel) {
   let queue = guildQueues.get(guild.id);
   if (queue) return queue;
-
+  registerVoiceEvents(guild.client);
   const connection = joinVoiceChannel({
     channelId: voiceChannel.id,
     guildId: guild.id,
     adapterCreator: createDiscordJsV12Adapter(guild),
   });
+  const player = createAudioPlayer();
+  connection.subscribe(player);
+  queue = { connection, player, voiceChannel, textChannel, songs: [], playing: false };
+  
+  player.on(AudioPlayerStatus.Idle, () => {
+    queue.songs.shift();
+    if (queue.songs.length) playSong(guild.id, queue.songs[0]);
+    else queue.playing = false;
+  });
 
-  queue = {
-    connection,
-    player: createAudioPlayer(),
-    textChannel,
-    songs: [],
-    playing: false,
-  };
-
-  connection.subscribe(queue.player);
   guildQueues.set(guild.id, queue);
   return queue;
 }
@@ -76,35 +71,26 @@ function ensureQueue(guild, voiceChannel, textChannel) {
 async function playSong(guildId, song) {
   const queue = guildQueues.get(guildId);
   if (!queue) return;
-  
-  const stream = ytdl(song.url, {
-    filter: "audioonly",
-    quality: "highestaudio",
-    highWaterMark: 1 << 25,
-  });
-
+  const stream = ytdl(song.url, { filter: "audioonly", highWaterMark: 1 << 25 });
   const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
   queue.player.play(resource);
   queue.playing = true;
 }
 
+// BUSQUEDA ESTABLE
 async function searchSong(query) {
   try {
-    // Si es un link directo
     if (ytdl.validateURL(query)) {
       const info = await ytdl.getBasicInfo(query);
       return { title: info.videoDetails.title, url: info.videoDetails.video_url };
     }
-
-    // BUSQUEDA ESTABLE CON YT-SEARCH
-    const result = await ytSearch(query);
-    if (!result || result.videos.length === 0) return null;
-    
-    return { title: result.videos[0].title, url: result.videos[0].url };
-  } catch (err) {
-    console.error("Error en búsqueda:", err);
+    const r = await ytSearch(query);
+    const video = r.videos[0];
+    return video ? { title: video.title, url: video.url } : null;
+  } catch (e) {
+    console.error("Error en búsqueda:", e);
     return null;
   }
 }
 
-module.exports = { guildQueues, registerVoiceEvents, ensureQueue, playSong, searchSong };
+module.exports = { ensureQueue, playSong, searchSong, guildQueues };
