@@ -36,51 +36,51 @@ client.on('message', async message => {
   }
 })
 
-client.on("message", (message) => {
-  client.on("hasPermission", (hasPermission) => {
+client.on("messageCreate", (message) => {
+  // 1. Ignorar mensajes de los propios bots para evitar bucles infinitos
+  if (message.author.bot) return;
 
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
+  // 2. EXCEPCIÓN PARA ADMINS: Si el miembro tiene permiso de administrar mensajes, el bot no hace nada
+  if (message.member && message.member.permissions.has("MANAGE_MESSAGES")) return;
 
-  let confirm = false;
+  const messageContentLower = message.content.toLowerCase();
 
-  var i;
-  for (i = 0; i < badwords.length; i++) {
-
-    if (message.content.toLowerCase().includes(badwords[i].toLowerCase()))
-      confirm = true;
-
-  }
-
-  if (confirm) {
-    message.delete()
-    message.channel.send("No digas malas palabras!").then(x => x.delete({ timeout: 5000 }))
-  }
-
-
-});
-
-client.on("message", (message) => {
-  client.on("hasPermission", (hasPermission) => {
-
-    if (!message.member.hasPermission("MANAGE_MESSAGES")) {
-
-      let confirm = false;
-
-      var i;
-      for (i = 0; i < links.length; i++) {
-
-        if (message.content.toLowerCase().includes(links[i].toLowerCase()))
-          confirm = true;
-
-      }
-
-      if (confirm) {
-        message.delete()
-        message.channel.send("No puedes enviar enlaces!").then(x => x.delete({ timeout: 5000 }))
-      }
+  // --- FILTRO DE MALAS PALABRAS ---
+  let contieneMalaPalabra = false;
+  for (let i = 0; i < badwords.length; i++) {
+    if (messageContentLower.includes(badwords[i].toLowerCase())) {
+      contieneMalaPalabra = true;
+      break; // Detener el bucle si ya encontramos una coincidencia
     }
-  });
+  }
+
+  if (contieneMalaPalabra) {
+    message.delete().catch(console.error);
+    return message.channel.send("¡No digas malas palabras!")
+      .then(msg => {
+        // Nota: En versiones recientes de Discord.js (v13/v14), se usa setTimeout en lugar de .delete({ timeout })
+        setTimeout(() => msg.delete().catch(() => {}), 5000);
+      }).catch(console.error);
+  }
+
+  // --- FILTRO DE ENLACES ---
+  let contieneEnlace = false;
+  for (let i = 0; i < links.length; i++) {
+    if (messageContentLower.includes(links[i].toLowerCase())) {
+      contieneEnlace = true;
+      break; 
+    }
+  }
+
+  if (contieneEnlace) {
+    message.delete().catch(console.error);
+    return message.channel.send("¡No puedes enviar enlaces!")
+      .then(msg => {
+        setTimeout(() => msg.delete().catch(() => {}), 5000);
+      }).catch(console.error);
+  }
 });
+
 
 let prefix = "t!"
 
