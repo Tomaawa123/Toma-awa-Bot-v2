@@ -172,14 +172,14 @@ client.snipes = new Map()
 
 
 client.on("message", (message) => {
-  if (message.content.startsWith("ping")) {
+  if (message.content.toLowerCase().startsWith("ping")) {
     message.channel.send("pong!");
   }
 
 });
 
 client.on("message", (message) => {
-  if (message.content.startsWith("t!ping")) {
+  if (message.content.toLowerCase().startsWith("t!ping")) {
     const embed = new Discord.MessageEmbed()
       .setTitle(`Mi ping: **${client.ws.ping}ms**`)
       .setColor("RANDOM")
