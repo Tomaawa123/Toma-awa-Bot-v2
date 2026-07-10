@@ -1,23 +1,27 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
-const { Client, MessageEmbed } = require('discord.js');
 
 module.exports = {
     name: "ayudaadmin",
     alias: ["ayudaadmin"],
- 
-run (client, message, args){
+
+run(client, message, args){
 
   var perms = message.member.hasPermission("MANAGE_MESSAGES")
   if(!perms) return message.channel.send("No tienes permisos para utilizar este comando.")
 
   const embed = new Discord.MessageEmbed()
-
-  .setTitle("MI LISTA DE COMANDOS")
-  .setThumbnail(client.user.displayAvatarURL())
-  .setDescription("Prefix: t! \n :face_with_monocle: Moderacion: \n invite \n borrar \n lock \n unlock \n ticket \n close (ticket) \n ban \n kick \n hackban \n mute \n tempmute \n nuke \n private \n uptime \n setbienvenidas \n setdespedidas \n say \n ticket \n close \n traducir \n lista-idiomas \n warn \n warns \n unwarn \n snipe (view deleted messages)\n bot: anti-links, anti-badwords, anti-spam \n :tada: Fun: \n say \n musica \n hack \n text-fortnite <color> <texto> \n addmoney \n afk \n work \n with \n shop \n buy \n confess \n crime \n dep \n fish \n rob \n bal \n say \n rank \n :underage: NSFW: \n 4k \n ass \n gif \n anal \n hentai \n pussy \n yaoi \n si tienes una idea para mas comandos puedes decirle a tomaawa#4877 para que me agregue mas comandos")
-  .setColor("RANDOM")
-  .setFooter("Toma awa v35")
+    .setTitle("🛠️ Lista de comandos de administrador - Toma awa")
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor("RANDOM")
+    .setDescription("Prefix: `t!` (funciona en mayúsculas o minúsculas)")
+    .addField("🧑‍⚖️ Moderación", "`ban`, `kick`, `hackban`, `mute`, `tempmute`, `unmute`, `warn`, `warns`, `unwarn`, `nuke`, `borrar` (borrar mensajes), `lock`, `unlock`, `private`, `snipe` (ver mensajes borrados)\nProtecciones automáticas: anti-links, anti-groserías, anti-spam")
+    .addField("⚙️ Configuración del servidor", "`setbienvenidas`, `setdespedidas`, `set-prefix`, `ticket`, `close` (cerrar ticket), `invite`, `uptime`")
+    .addField("🎵 Música", "`play/p`, `join/j`, `skip/s`, `pause/pa`, `resume/r`, `loop/l`, `loopqueue/lq`, `disconnect/d`, `musica` (ayuda música)")
+    .addField("🔊 Canales privados", "`crearcanal <nombre> @amigos` crea una sala de voz privada\n`expulsarcanal @usuario` expulsa a alguien de una sala")
+    .addField("🎭 Roles", "`autorol` configura roles automáticos por reacción")
+    .addField("🎉 Diversión y economía", "`say`, `hack`, `text-fortnite <color> <texto>`, `addmoney`, `work`, `with`, `shop`, `buy`, `confesar`, `crime`, `dep`, `pescar`, `rob`, `bal`, `rank`, `tictactoe`, `traducir`, `lista-idiomas`")
+    .addField("🔞 NSFW (solo en el canal autorizado +18)", "`4k`, `ass`, `gif`, `anal`, `hentai`, `pussy`, `yaoi`")
+    .setFooter("Toma awa v35 | Si tienes ideas para más comandos, dile a tomaawa#4877")
 
   message.channel.send(embed)
 

@@ -102,10 +102,15 @@ function cargarComandos(dir) {
 
 cargarComandos('comandos');
 
+const { initTempVoiceManager } = require('./utils/tempVoiceManager');
+const { initReactionRoles } = require('./utils/reactionRoles');
+initTempVoiceManager(client);
+initReactionRoles(client);
+
 client.on("message", (message) => {
 
-  if (!message.content.startsWith(prefix)) return;
   if (message.author.bot) return;
+  if (!message.content.toLowerCase().startsWith(prefix)) return;
 
 
 

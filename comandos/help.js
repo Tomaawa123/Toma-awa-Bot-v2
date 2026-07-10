@@ -1,21 +1,22 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
-const { Client, MessageEmbed } = require('discord.js');
 
 module.exports = {
     name: "help",
     alias: ["help"],
- 
-run (client, message, args){
 
+run(client, message, args){
 
   const embed = new Discord.MessageEmbed()
-
-  .setTitle ("MY COMMAND LIST")
-  .setThumbnail (client.user.displayAvatarURL ())
-  .setDescription ("Prefix: t! \n Moderation: \n invite \n ticket \n close (ticket) \n tranlate \n list-languaje \n :tada: Fun: \n say \n hack \n text-fortnite <color> <text> \n addmoney \n afk \n work \n with \n shop \n buy \n confess \n crime \n dep \n fish \n rob \n bal \n say \n rank \n :underage: NSFW: \n 4k \n ass \n gif \n anal \n hentai \n pussy \n yaoi \n if you have an idea to add another command you can tell tomaawa#4877 to get me more commands")
-  .setColor ("RANDOM")
-  .setFooter("Take water v35")
+    .setTitle("📖 Command list - Toma awa")
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor("RANDOM")
+    .setDescription("Prefix: `t!` (works with uppercase or lowercase)")
+    .addField("🎵 Music", "`play/p` play a song\n`join/j` join your voice channel\n`skip/s` skip song\n`pause/pa` pause\n`resume/r` resume\n`loop/l` loop song\n`loopqueue/lq` loop queue\n`disconnect/d` disconnect\n`music` music help")
+    .addField("🔊 Private channels", "`crearcanal <name> @friends` create your own private voice room\n`expulsarcanal @user` kick someone from your room")
+    .addField("🎭 Roles", "`autorol` set up reaction roles (admins only)")
+    .addField("🎉 Fun & economy", "`say`, `hack`, `text-fortnite <color> <text>`, `addmoney`, `work`, `with`, `shop`, `buy`, `confess`, `crime`, `dep`, `fish`, `rob`, `bal`, `rank`, `tictactoe`, `traducir`, `lista-idiomas`")
+    .addField("🔞 NSFW (allowed channel only)", "`4k`, `ass`, `gif`, `anal`, `hentai`, `pussy`, `yaoi`")
+    .setFooter("Take water v35 | If you have ideas for more commands, tell tomaawa#4877")
 
   message.channel.send(embed)
 

@@ -1,21 +1,22 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
-const { Client, MessageEmbed } = require('discord.js');
 
 module.exports = {
     name: "ayuda",
     alias: ["ayuda"],
- 
-run (client, message, args){
 
+run(client, message, args){
 
   const embed = new Discord.MessageEmbed()
-
-  .setTitle("MI LISTA DE COMANDOS")
-  .setThumbnail(client.user.displayAvatarURL())
-  .setDescription("Prefix: t! \n Moderacion: \n uptime \n invite \n ticket \n close (ticket) \n uptime \n traducir \n lista-idiomas \n :tada: Fun: \n musica \n hack \n say \n  text-fortnite <color> <texto> \n addmoney \n afk \n work \n with \n shop \n buy \n confess \n crime \n dep \n pescar \n rob \n bal \n say \n rank \n underage: NSFW: \n 4k \n ass \n gif \n anal \n hentai \n pussy \n yaoi \n si tienes ideas para mas comandos puedes decirle a tomaawa#4877 para que me agregue mas comandos")
-  .setColor("RANDOM")
-  .setFooter("Toma awa v35")
+    .setTitle("📖 Lista de comandos - Toma awa")
+    .setThumbnail(client.user.displayAvatarURL())
+    .setColor("RANDOM")
+    .setDescription("Prefix: `t!` (funciona en mayúsculas o minúsculas)")
+    .addField("🎵 Música", "`play/p` reproduce una canción\n`join/j` me uno a tu canal de voz\n`skip/s` salta la canción\n`pause/pa` pausa\n`resume/r` reanuda\n`loop/l` repetir canción\n`loopqueue/lq` repetir la cola\n`disconnect/d` me desconecto\n`musica` ver ayuda de música")
+    .addField("🔊 Canales privados", "`crearcanal <nombre> @amigos` crea tu propia sala de voz privada\n`expulsarcanal @usuario` expulsa a alguien de tu sala")
+    .addField("🎭 Roles", "`autorol` configura roles automáticos por reacción (solo administradores)")
+    .addField("🎉 Diversión y economía", "`musica`, `hack`, `say`, `text-fortnite <color> <texto>`, `addmoney`, `work`, `with`, `shop`, `buy`, `confesar`, `crime`, `dep`, `pescar`, `rob`, `bal`, `rank`, `tictactoe`, `traducir`, `lista-idiomas`")
+    .addField("🔞 NSFW (solo en el canal autorizado +18)", "`4k`, `ass`, `gif`, `anal`, `hentai`, `pussy`, `yaoi`")
+    .setFooter("Toma awa v35 | Si tienes ideas para más comandos, dile a tomaawa#4877")
 
   message.channel.send(embed)
 
