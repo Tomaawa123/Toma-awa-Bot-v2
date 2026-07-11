@@ -12,7 +12,7 @@ run(client, message, args){
     .setColor("RANDOM")
     .setDescription("Prefix: `t!` (works with uppercase or lowercase)")
     .addField("🎵 Music", "`play/p` play a song\n`join/j` join your voice channel\n`skip/s` skip song\n`pause/pa` pause\n`resume/r` resume\n`loop/l` loop song\n`loopqueue/lq` loop queue\n`disconnect/d` disconnect\n`music` music help")
-    .addField("🔊 Private channels", "`crearcanal <name> @friends` create your own private voice room\n`expulsarcanal @user` kick someone from your room")
+    .addField("🔊 Private channels", "`crearcanal <name> @friends` create your own private voice room\n`expulsarcanal @user` kick someone from your room \n `ticket`, `close` (cerrar ticket),")
     .addField("🎭 Roles", "`autorol` set up reaction roles (admins only)")
     .addField("🎉 Fun & economy", "`say`, `hack`, `text-fortnite <color> <text>`, `addmoney`, `work`, `with`, `shop`, `buy`, `confess`, `crime`, `dep`, `fish`, `rob`, `bal`, `rank`, `tictactoe`, `traducir`, `lista-idiomas`")
     .addField("🔞 NSFW (allowed channel only)", "`4k`, `ass`, `gif`, `anal`, `hentai`, `pussy`, `yaoi`")

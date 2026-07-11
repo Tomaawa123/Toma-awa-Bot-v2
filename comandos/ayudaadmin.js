@@ -14,7 +14,7 @@ run(client, message, args){
     .setThumbnail(client.user.displayAvatarURL())
     .setColor("RANDOM")
     .setDescription("Prefix: `t!` (funciona en mayúsculas o minúsculas)")
-    .addField("🧑‍⚖️ Moderación", "`ban`, `kick`, `hackban`, `mute`, `tempmute`, `unmute`, `warn`, `warns`, `unwarn`, `nuke`, `borrar` (borrar mensajes), `lock`, `unlock`, `private`, `snipe` (ver mensajes borrados)\n actualizar (enviar mensaje de actualizacion al canal logs) \n Protecciones automáticas: anti-links, anti-groserías, anti-spam")
+    .addField("🧑‍⚖️ Moderación", "`ban`, `kick`, `hackban`, `mute`, `tempmute`, `unmute`, `warn`, `warns`, `unwarn`, `nuke`, `borrar` (borrar mensajes), `lock`, `unlock`, `private`, `snipe` (ver mensajes borrados)\n `actualizar` (enviar mensaje de actualizacion al canal logs) \n Protecciones automáticas: anti-links, anti-groserías, anti-spam")
     .addField("⚙️ Configuración del servidor", "`setbienvenidas`, `setdespedidas`, `set-prefix`, `ticket`, `close` (cerrar ticket), `invite`, `uptime`")
     .addField("🎵 Música", "`play/p`, `join/j`, `skip/s`, `pause/pa`, `resume/r`, `loop/l`, `loopqueue/lq`, `disconnect/d`, `musica` (ayuda música)")
     .addField("🔊 Canales privados", "`crearcanal <nombre> @amigos` crea una sala de voz privada\n`expulsarcanal @usuario` expulsa a alguien de una sala")
