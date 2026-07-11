@@ -27,7 +27,7 @@ module.exports = {
 }; */
 
 const { LoadType } = require("shoukaku");
-const Command = require("../../structures/Command.js");
+const Command = require("../comandomusica.js");
 
 module.exports = class Play extends Command {
   constructor(client) {
