@@ -8,10 +8,10 @@ module.exports = {
      */
     run : async(client, message) => {
         const ch = message.guild.channels.cache.find(ch => ch.name === message.author.id)
-        if(ch) return message.channel.send('You already have a ticket open.')
+        if(ch) return message.channel.send('Y tienes un ticket abierto.\n You already have a ticket open.')
         message.guild.channels.create(`${message.author.id}`, {
             type : 'text',
-            parent : '1524866280417530016',
+            parent : '1525574888448983153',
             permissionOverwrites : [
                 {
                     id : message.guild.id,
