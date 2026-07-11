@@ -7,7 +7,6 @@ const { badwords } = require("./data.json")
 require('dotenv').config();
 const { links } = require("./links.json")
 const { Client, Collection, Guild } = require('discord.js')
-const { initReactionRoles } = require("./utils/reactionRoles");
 
 const fs = require('fs');
 
