@@ -42,6 +42,7 @@ module.exports = {
     const emojiToReact = customEmojiMatch ? customEmojiMatch[1] : emojiRaw;
     const emojiKeyValue = customEmojiMatch ? customEmojiMatch[1] : emojiRaw;
 
+
     try {
       await targetMessage.react(emojiToReact);
     } catch (e) {

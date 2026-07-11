@@ -1,4 +1,4 @@
-const { searchSong, guildQueues, playSong } = require("../utils/musicManager");
+const { searchSong, playSong, ensureQueue } = require("../utils/musicManager");
 
 module.exports = {
   name: "play",
@@ -12,16 +12,14 @@ module.exports = {
     const song = await searchSong(query);
     if (!song) return message.channel.send("❌ No encontré resultados.");
 
-    let queue = guildQueues.get(message.guild.id);
-    if (!queue) {
-      const connection = await voiceChannel.join();
-      queue = { connection, songs: [], playing: false };
-      guildQueues.set(message.guild.id, queue);
-    }
+    const queue = ensureQueue(message.guild, voiceChannel, message.channel);
 
     queue.songs.push(song);
     message.channel.send(`✅ Agregado: **${song.title}**`);
 
-    if (!queue.playing) playSong(message.guild, queue.songs[0], message.channel);
+    if (!queue.playing) {
+      await playSong(message.guild.id, queue.songs[0]);
+    }
   },
 };
+

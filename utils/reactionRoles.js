@@ -47,8 +47,9 @@ function initReactionRoles(client) {
     const { d: data } = packet;
     if (!data.guild_id) return;
 
-    const channel = client.channels.cache.get(data.channel_id);
+    const channel = client.channels.cache.get(data.channel_id) || (await client.channels.fetch(data.channel_id).catch(() => null));
     if (!channel) return;
+
 
     let message;
     try {
@@ -59,6 +60,7 @@ function initReactionRoles(client) {
 
     const emojiId = data.emoji.id || data.emoji.name;
     const roleId = getRoleId(data.guild_id, data.message_id, emojiId);
+
     if (!roleId) return;
 
     const guild = client.guilds.cache.get(data.guild_id);
