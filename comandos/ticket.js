@@ -8,8 +8,8 @@ module.exports = {
      */
     run : async(client, message) => {
         const ch = message.guild.channels.cache.find(ch => ch.name === message.author.id)
-        if(ch) return message.channel.send('Y tienes un ticket abierto.\n You already have a ticket open.')
-        message.guild.channels.create(`${message.author.id}`, {
+        if(ch) return message.channel.send('Ya tienes un ticket abierto.\n You already have a ticket open.')
+        message.guild.channels.create(`Ticket-${message.author.id}`, {
             type : 'text',
             parent : '1525574888448983153',
             permissionOverwrites : [
@@ -23,7 +23,7 @@ module.exports = {
                 }
             ]
         }).then(async channel=> {
-            message.reply(`click <#${channel.id}> to view your ticket`)
+            message.reply(`click <#${channel.id}> para ver tu ticket \n to view your ticket`)
             channel.send(`${message.author}, welcome to your ticket!`)
         })
     }

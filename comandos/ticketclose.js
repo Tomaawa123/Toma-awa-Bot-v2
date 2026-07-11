@@ -8,8 +8,8 @@ module.exports = {
      * @param {Message} message
      */
     run : async(client, message) => {
-        if(message.channel.parentID !== '1524659221222789120') return message.channel.send('You can only use this command in a ticket!');
-        const transcriptChannel = message.guild.channels.cache.get('91524866280417530016')
+        if(message.channel.parentID !== '1525574888448983153') return message.channel.send('Solo puedes usar este comando en un ticket! \n You can only use this command in a ticket!');
+        const transcriptChannel = message.guild.channels.cache.get('1525577408118390876')
         message.channel.send('Deleting ticket in 5 seconds.....')
         setTimeout(() => {
             message.channel.delete().then(async ch=> {
